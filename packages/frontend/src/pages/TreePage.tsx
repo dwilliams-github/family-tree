@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { FamilyTree } from '@/components/tree/FamilyTree';
 import { PersonPopup } from '@/components/person/PersonPopup';
 import { PersonForm } from '@/components/person/PersonForm';
@@ -18,6 +19,9 @@ export function TreePage() {
       </div>
       <div className="absolute top-3 right-3 z-10 flex items-center gap-2 text-sm text-muted-foreground">
         <span>{user?.displayName ?? user?.email}</span>
+        {user?.role === 'ADMIN' && (
+          <Link to="/admin" className="text-sm underline underline-offset-4">Admin</Link>
+        )}
         <Button size="sm" variant="outline" onClick={logout}>Sign out</Button>
       </div>
 
