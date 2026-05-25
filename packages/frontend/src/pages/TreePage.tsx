@@ -1,7 +1,12 @@
+import { useState } from 'react';
+import { FamilyTree } from '@/components/tree/FamilyTree';
+
 export function TreePage() {
+  const [_selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
+
   return (
-    <div className="flex items-center justify-center h-full min-h-screen text-muted-foreground">
-      Tree view — coming in Phase 6
+    <div className="w-screen h-screen">
+      <FamilyTree onPersonSelect={setSelectedPersonId} />
     </div>
   );
 }
