@@ -3,6 +3,10 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { config } from './config.js';
 import { authRouter } from './routes/auth.js';
+import { personsRouter } from './routes/persons.js';
+import { relationshipsRouter } from './routes/relationships.js';
+import { treeRouter } from './routes/tree.js';
+import { auditRouter } from './routes/audit.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 export function createApp() {
@@ -17,6 +21,10 @@ export function createApp() {
   });
 
   app.use('/api/auth', authRouter);
+  app.use('/api/persons', personsRouter);
+  app.use('/api/relationships', relationshipsRouter);
+  app.use('/api/tree', treeRouter);
+  app.use('/api/audit', auditRouter);
 
   app.use(errorHandler);
 
