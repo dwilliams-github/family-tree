@@ -2,7 +2,6 @@ import { useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { uploadPersonPhoto, deletePersonPhoto } from '@/api/persons';
-import { Button } from '@/components/ui/button';
 import { PersonAvatar } from './PersonAvatar';
 import type { PersonSummary } from '@family-tree/shared';
 
@@ -55,40 +54,46 @@ export function PhotoUpload({ person }: Props) {
     }
   }
 
+  function cancel() {
+    setPreview(null);
+    if (inputRef.current) inputRef.current.value = '';
+  }
+
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex flex-col items-center gap-1.5">
+      <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+
       {preview
         ? <img src={preview} alt="Preview" className="h-24 w-24 rounded-full object-cover" />
         : <PersonAvatar personId={person.id} hasPhoto={person.hasPhoto} firstName={person.firstName} lastName={person.lastName} size="lg" />
       }
-      <div className="flex flex-col gap-2">
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={handleFileChange}
-        />
+
+      <div className="flex gap-2 text-xs">
         {preview ? (
-          <div className="flex gap-2">
-            <Button size="sm" onClick={handleUpload} disabled={uploading}>
-              {uploading ? 'Uploading…' : 'Save photo'}
-            </Button>
-            <Button size="sm" variant="outline" onClick={() => { setPreview(null); if (inputRef.current) inputRef.current.value = ''; }}>
-              Cancel
-            </Button>
-          </div>
+          <>
+            <button onClick={handleUpload} disabled={uploading}
+              className="text-primary hover:underline disabled:opacity-50">
+              {uploading ? 'Saving…' : 'Save'}
+            </button>
+            <span className="text-muted-foreground">·</span>
+            <button onClick={cancel} className="text-muted-foreground hover:text-foreground">Cancel</button>
+          </>
         ) : (
-          <div className="flex gap-2">
-            <Button size="sm" variant="outline" onClick={() => inputRef.current?.click()} disabled={uploading}>
-              {person.hasPhoto ? 'Change photo' : 'Add photo'}
-            </Button>
+          <>
+            <button onClick={() => inputRef.current?.click()} disabled={uploading}
+              className="text-muted-foreground hover:text-foreground disabled:opacity-50">
+              {person.hasPhoto ? 'Change' : 'Add photo'}
+            </button>
             {person.hasPhoto && (
-              <Button size="sm" variant="outline" onClick={handleDelete} disabled={uploading}>
-                Remove
-              </Button>
+              <>
+                <span className="text-muted-foreground">·</span>
+                <button onClick={handleDelete} disabled={uploading}
+                  className="text-muted-foreground hover:text-foreground disabled:opacity-50">
+                  Remove
+                </button>
+              </>
             )}
-          </div>
+          </>
         )}
       </div>
     </div>

@@ -19,6 +19,10 @@ const personInputSchema = z.object({
   dateOfDeath: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   placeOfBirth: z.string().optional(),
   placeOfDeath: z.string().optional(),
+  addressStreet: z.string().optional(),
+  addressCity: z.string().optional(),
+  addressPostalCode: z.string().optional(),
+  addressCountry: z.string().optional(),
   bio: z.string().optional(),
   isLiving: z.boolean().optional(),
 });

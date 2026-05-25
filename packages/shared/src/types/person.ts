@@ -13,6 +13,10 @@ export interface Person extends PersonSummary {
   gender?: 'male' | 'female' | 'other';
   placeOfBirth?: string;
   placeOfDeath?: string;
+  addressStreet?: string;
+  addressCity?: string;
+  addressPostalCode?: string;
+  addressCountry?: string;
   bio?: string;
   createdBy: string;
   createdAt: string;
@@ -28,6 +32,10 @@ export interface PersonInput {
   dateOfDeath?: string;
   placeOfBirth?: string;
   placeOfDeath?: string;
+  addressStreet?: string;
+  addressCity?: string;
+  addressPostalCode?: string;
+  addressCountry?: string;
   bio?: string;
   isLiving?: boolean;
 }

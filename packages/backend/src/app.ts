@@ -7,6 +7,7 @@ import { personsRouter } from './routes/persons.js';
 import { relationshipsRouter } from './routes/relationships.js';
 import { treeRouter } from './routes/tree.js';
 import { auditRouter } from './routes/audit.js';
+import { exportRouter } from './routes/export.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 export function createApp() {
@@ -25,6 +26,7 @@ export function createApp() {
   app.use('/api/relationships', relationshipsRouter);
   app.use('/api/tree', treeRouter);
   app.use('/api/audit', auditRouter);
+  app.use('/api/export', exportRouter);
 
   app.use(errorHandler);
 

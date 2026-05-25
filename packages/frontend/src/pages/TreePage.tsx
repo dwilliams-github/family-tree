@@ -5,6 +5,8 @@ import { PersonPopup } from '@/components/person/PersonPopup';
 import { PersonForm } from '@/components/person/PersonForm';
 import { useAuth } from '@/auth/AuthContext';
 import { Button } from '@/components/ui/button';
+import { downloadMarkdown } from '@/api/export';
+import { toast } from 'sonner';
 
 export function TreePage() {
   const { user, logout } = useAuth();
@@ -25,7 +27,14 @@ export function TreePage() {
         <Button size="sm" variant="outline" onClick={logout}>Sign out</Button>
       </div>
 
-      <FamilyTree onPersonSelect={setSelectedPersonId} />
+      <FamilyTree selectedPersonId={selectedPersonId} onPersonSelect={setSelectedPersonId} />
+
+      <div className="absolute bottom-3 left-3 z-10 flex items-center gap-3">
+        <span className="text-xs text-muted-foreground select-none">The Yap Family Tree</span>
+        <Button size="sm" variant="outline" onClick={() => downloadMarkdown().catch(() => toast.error('Export failed'))}>
+          Export
+        </Button>
+      </div>
 
       <PersonPopup personId={selectedPersonId} onClose={() => setSelectedPersonId(null)} />
       <PersonForm open={addOpen} onOpenChange={setAddOpen} />

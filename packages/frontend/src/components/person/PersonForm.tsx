@@ -19,6 +19,10 @@ const schema = z.object({
   dateOfDeath: z.string().optional(),
   placeOfBirth: z.string().optional(),
   placeOfDeath: z.string().optional(),
+  addressStreet: z.string().optional(),
+  addressCity: z.string().optional(),
+  addressPostalCode: z.string().optional(),
+  addressCountry: z.string().optional(),
   bio: z.string().optional(),
   isLiving: z.boolean().optional(),
 });
@@ -34,6 +38,10 @@ function toInput(v: FormValues) {
     dateOfDeath: v.dateOfDeath || undefined,
     placeOfBirth: v.placeOfBirth || undefined,
     placeOfDeath: v.placeOfDeath || undefined,
+    addressStreet: v.addressStreet || undefined,
+    addressCity: v.addressCity || undefined,
+    addressPostalCode: v.addressPostalCode || undefined,
+    addressCountry: v.addressCountry || undefined,
     bio: v.bio || undefined,
     isLiving: v.isLiving,
   };
@@ -61,6 +69,10 @@ export function PersonForm({ open, onOpenChange, person }: Props) {
           dateOfDeath: person.dateOfDeath ?? '',
           placeOfBirth: person.placeOfBirth ?? '',
           placeOfDeath: person.placeOfDeath ?? '',
+          addressStreet: person.addressStreet ?? '',
+          addressCity: person.addressCity ?? '',
+          addressPostalCode: person.addressPostalCode ?? '',
+          addressCountry: person.addressCountry ?? '',
           bio: person.bio ?? '',
           isLiving: person.isLiving,
         }
@@ -172,6 +184,36 @@ export function PersonForm({ open, onOpenChange, person }: Props) {
               <FormField control={form.control} name="placeOfDeath" render={({ field }) => (
                 <FormItem>
                   <FormLabel>Place of death</FormLabel>
+                  <FormControl><Input {...field} /></FormControl>
+                </FormItem>
+              )} />
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Residence</p>
+              <FormField control={form.control} name="addressStreet" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Street</FormLabel>
+                  <FormControl><Input {...field} placeholder="123 Main St" /></FormControl>
+                </FormItem>
+              )} />
+              <div className="grid grid-cols-2 gap-3">
+                <FormField control={form.control} name="addressCity" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>City / State</FormLabel>
+                    <FormControl><Input {...field} placeholder="Boston, MA" /></FormControl>
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="addressPostalCode" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Postal code</FormLabel>
+                    <FormControl><Input {...field} /></FormControl>
+                  </FormItem>
+                )} />
+              </div>
+              <FormField control={form.control} name="addressCountry" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Country</FormLabel>
                   <FormControl><Input {...field} /></FormControl>
                 </FormItem>
               )} />

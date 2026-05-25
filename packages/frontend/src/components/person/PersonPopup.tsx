@@ -9,7 +9,6 @@ import { useAuth } from '@/auth/AuthContext';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { PersonAvatar } from './PersonAvatar';
 import { PersonForm } from './PersonForm';
 import { PhotoUpload } from './PhotoUpload';
 import { RelationshipPanel } from '@/components/relationship/RelationshipPanel';
@@ -19,12 +18,26 @@ interface Props {
   onClose: () => void;
 }
 
+function SectionHeader({ title, onEdit }: { title: string; onEdit?: () => void }) {
+  return (
+    <div className="flex items-center justify-between">
+      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{title}</p>
+      {onEdit && (
+        <button onClick={onEdit} className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2">
+          Edit
+        </button>
+      )}
+    </div>
+  );
+}
+
 function DetailRow({ label, value }: { label: string; value?: string | null }) {
-  if (!value) return null;
   return (
     <div className="grid grid-cols-[7rem_1fr] gap-1 text-sm">
       <span className="text-muted-foreground">{label}</span>
-      <span>{value}</span>
+      <span className={value ? undefined : 'text-muted-foreground/40'}>
+        {value ?? '—'}
+      </span>
     </div>
   );
 }
@@ -35,7 +48,6 @@ export function PersonPopup({ personId, onClose }: Props) {
   const { data: person, isLoading } = usePerson(personId);
   const { data: tree } = useTree();
   const [editOpen, setEditOpen] = useState(false);
-  const [photoOpen, setPhotoOpen] = useState(false);
   const [undoing, setUndoing] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -74,7 +86,7 @@ export function PersonPopup({ personId, onClose }: Props) {
   return (
     <>
       <Sheet open={!!personId} onOpenChange={(open) => { if (!open) onClose(); }}>
-        <SheetContent className="w-full sm:max-w-md overflow-y-auto flex flex-col gap-6">
+        <SheetContent className="w-full sm:max-w-md overflow-y-auto flex flex-col gap-6 p-6">
           {isLoading || !person ? (
             <div className="space-y-4 pt-4">
               <div className="flex items-center gap-4">
@@ -93,15 +105,9 @@ export function PersonPopup({ personId, onClose }: Props) {
                 <SheetTitle className="sr-only">{person.firstName} {person.lastName}</SheetTitle>
               </SheetHeader>
 
-              {/* Photo + name header */}
+              {/* Photo + name */}
               <div className="flex items-center gap-4">
-                <PersonAvatar
-                  personId={person.id}
-                  hasPhoto={person.hasPhoto}
-                  firstName={person.firstName}
-                  lastName={person.lastName}
-                  size="lg"
-                />
+                <PhotoUpload person={person} />
                 <div>
                   <h2 className="text-xl font-semibold leading-tight">
                     {person.firstName} {person.lastName ?? ''}
@@ -115,20 +121,24 @@ export function PersonPopup({ personId, onClose }: Props) {
                 </div>
               </div>
 
-              {/* Detail rows */}
-              <div className="space-y-1.5">
-                <DetailRow label="Born" value={[person.dateOfBirth, person.placeOfBirth].filter(Boolean).join(' · ')} />
-                <DetailRow label="Died" value={[person.dateOfDeath, person.placeOfDeath].filter(Boolean).join(' · ')} />
-                <DetailRow label="Gender" value={person.gender} />
-              </div>
-
-              {/* Bio / notes */}
-              {person.bio && (
-                <div className="space-y-1">
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Notes</p>
-                  <p className="text-sm whitespace-pre-wrap">{person.bio}</p>
+              {/* Details with inline Edit */}
+              <div className="space-y-2">
+                <SectionHeader title="Details" onEdit={() => setEditOpen(true)} />
+                <div className="space-y-1.5">
+                  <DetailRow label="Born" value={[person.dateOfBirth, person.placeOfBirth].filter(Boolean).join(' · ')} />
+                  <DetailRow label="Died" value={[person.dateOfDeath, person.placeOfDeath].filter(Boolean).join(' · ')} />
+                  <DetailRow label="Gender" value={person.gender} />
+                  <DetailRow
+                    label={person.isLiving ? 'Residence' : 'Last residence'}
+                    value={[
+                      person.addressStreet,
+                      [person.addressCity, person.addressPostalCode].filter(Boolean).join(' '),
+                      person.addressCountry,
+                    ].filter(Boolean).join(', ') || undefined}
+                  />
+                  <DetailRow label="Notes" value={person.bio} />
                 </div>
-              )}
+              </div>
 
               {/* Relationships */}
               {tree && (
@@ -139,20 +149,8 @@ export function PersonPopup({ personId, onClose }: Props) {
                 />
               )}
 
-              {/* Photo management */}
-              {photoOpen && (
-                <div className="space-y-2">
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Photo</p>
-                  <PhotoUpload person={person} />
-                </div>
-              )}
-
-              {/* Action buttons */}
+              {/* Rare actions — undo and admin delete only */}
               <div className="flex flex-wrap gap-2 pt-2 border-t border-border mt-auto">
-                <Button size="sm" variant="outline" onClick={() => setEditOpen(true)}>Edit</Button>
-                <Button size="sm" variant="outline" onClick={() => setPhotoOpen(v => !v)}>
-                  {photoOpen ? 'Hide photo' : 'Photo'}
-                </Button>
                 <Button size="sm" variant="outline" onClick={handleUndo} disabled={undoing}>
                   {undoing ? 'Undoing…' : 'Undo last edit'}
                 </Button>

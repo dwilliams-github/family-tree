@@ -51,9 +51,13 @@ model Person {
   gender        Gender?
   dateOfBirth   DateTime? @map("date_of_birth") @db.Date
   dateOfDeath   DateTime? @map("date_of_death") @db.Date
-  placeOfBirth  String?   @map("place_of_birth")
-  placeOfDeath  String?   @map("place_of_death")
-  bio           String?
+  placeOfBirth   String?   @map("place_of_birth")
+  placeOfDeath   String?   @map("place_of_death")
+  addressStreet     String?   @map("address_street")
+  addressCity       String?   @map("address_city")
+  addressPostalCode String?   @map("address_postal_code")
+  addressCountry    String?   @map("address_country")
+  bio            String?
   photoData     Bytes?    @map("photo_data")
   photoMimeType String?   @map("photo_mime_type")
   isLiving      Boolean   @default(true) @map("is_living")
