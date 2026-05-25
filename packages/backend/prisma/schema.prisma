@@ -1,0 +1,137 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  role         Role     @default(USER)
+  displayName  String?  @map("display_name")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  invitations  Invitation[]
+  persons      Person[]
+  relationships Relationship[]
+  auditLogs    AuditLog[]
+
+  @@map("users")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Invitation {
+  id         String    @id @default(uuid())
+  email      String
+  token      String    @unique
+  invitedBy  String    @map("invited_by")
+  expiresAt  DateTime  @map("expires_at") @db.Timestamptz
+  acceptedAt DateTime? @map("accepted_at") @db.Timestamptz
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  inviter    User      @relation(fields: [invitedBy], references: [id])
+
+  @@map("invitations")
+}
+
+model Person {
+  id            String    @id @default(uuid())
+  firstName     String    @map("first_name")
+  lastName      String?   @map("last_name")
+  birthName     String?   @map("birth_name")
+  gender        Gender?
+  dateOfBirth   DateTime? @map("date_of_birth") @db.Date
+  dateOfDeath   DateTime? @map("date_of_death") @db.Date
+  placeOfBirth  String?   @map("place_of_birth")
+  placeOfDeath  String?   @map("place_of_death")
+  bio           String?
+  photoData     Bytes?    @map("photo_data")
+  photoMimeType String?   @map("photo_mime_type")
+  isLiving      Boolean   @default(true) @map("is_living")
+  createdBy     String    @map("created_by")
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+
+  creator       User      @relation(fields: [createdBy], references: [id])
+  relationshipsAsA Relationship[] @relation("PersonA")
+  relationshipsAsB Relationship[] @relation("PersonB")
+
+  @@index([lastName])
+  @@map("persons")
+}
+
+enum Gender {
+  male
+  female
+  other
+}
+
+model Relationship {
+  id               String           @id @default(uuid())
+  personAId        String           @map("person_a_id")
+  personBId        String           @map("person_b_id")
+  relationshipType RelationshipType @map("relationship_type")
+  personARole      String?          @map("person_a_role")
+  personBRole      String?          @map("person_b_role")
+  startDate        DateTime?         @map("start_date") @db.Date
+  endDate          DateTime?         @map("end_date") @db.Date
+  notes            String?
+  createdBy        String           @map("created_by")
+  createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime         @updatedAt @map("updated_at") @db.Timestamptz
+
+  personA          Person           @relation("PersonA", fields: [personAId], references: [id], onDelete: Cascade)
+  personB          Person           @relation("PersonB", fields: [personBId], references: [id], onDelete: Cascade)
+  creator          User             @relation(fields: [createdBy], references: [id])
+
+  @@unique([personAId, personBId, relationshipType])
+  @@index([personAId])
+  @@index([personBId])
+  @@map("relationships")
+}
+
+enum RelationshipType {
+  parent_child
+  spouse
+  sibling
+}
+
+model AuditLog {
+  id             String      @id @default(uuid())
+  tableName      AuditTable  @map("table_name")
+  recordId       String      @map("record_id") @db.Uuid
+  action         AuditAction
+  performedBy    String      @map("performed_by")
+  previousState  Json?       @map("previous_state")
+  newState       Json?       @map("new_state")
+  changedFields  String[]    @map("changed_fields")
+  ipAddress      String?     @map("ip_address")
+  createdAt      DateTime    @default(now()) @map("created_at") @db.Timestamptz
+
+  performer      User        @relation(fields: [performedBy], references: [id])
+
+  @@index([tableName, recordId])
+  @@index([performedBy])
+  @@index([createdAt(sort: Desc)])
+  @@map("audit_log")
+}
+
+enum AuditTable {
+  persons
+  relationships
+}
+
+enum AuditAction {
+  INSERT
+  UPDATE
+  DELETE
+}

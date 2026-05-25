@@ -1,0 +1,17 @@
+node_modules/
+.nodeenv/
+dist/
+*.env
+!*.env.example
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+
+# Build outputs
+packages/*/dist/
+
+# Sensitive data
+seed.txt
+packages/backend/src/scripts/seed.ts
