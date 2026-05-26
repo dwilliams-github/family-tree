@@ -283,7 +283,7 @@ fi
 echo "Node: $(node --version)  npm: $(npm --version)"
 
 # ── PM2 + Prisma CLI (global, used by deploy script for migrations) ──────────
-npm install -g pm2 prisma
+npm install -g pm2
 pm2 startup systemd -u ec2-user --hp /home/ec2-user 2>/dev/null | grep "^sudo" | bash || true
 systemctl enable pm2-ec2-user 2>/dev/null || true
 

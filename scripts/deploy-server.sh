@@ -29,8 +29,8 @@ ENV_FILE="$APP_DIR/packages/backend/.env"
 set -a; source "$ENV_FILE"; set +a
 
 cd "$APP_DIR/packages/backend"
-prisma generate
-prisma migrate deploy
+npx prisma generate
+npx prisma migrate deploy
 
 # ── Restart via PM2 (run as ec2-user who owns the PM2 daemon) ────────────────
 ECOSYSTEM="$APP_DIR/packages/backend/ecosystem.config.cjs"
