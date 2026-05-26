@@ -6,6 +6,7 @@ import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as dlm from 'aws-cdk-lib/aws-dlm';
 import { Construct } from 'constructs';
 
+// Substitute your own domain and Route 53 hosted zone ID here
 const SUBDOMAIN      = 'tree';
 const HOSTED_ZONE_NAME = 'slashdave.com';
 const HOSTED_ZONE_ID   = 'Z09873553H2BGF8RX2UR8';

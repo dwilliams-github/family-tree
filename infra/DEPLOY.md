@@ -2,13 +2,26 @@
 
 ## Overview
 
-The app runs on a single EC2 t4g.small instance in `us-east-1`. Nginx terminates TLS and proxies to Node on port 3000. Express serves both the API and the Vite-built frontend. Postgres data lives on a separate EBS volume that survives instance replacement.
+A single EC2 t4g.small instance runs the Node.js backend and PostgreSQL. Nginx terminates TLS and proxies to Node on port 3000. Express serves both the API and the Vite-built frontend. Postgres data lives on a separate EBS volume that survives instance replacement.
 
 Deployments are triggered by pushing to `main`. GitHub Actions builds the app, uploads a tarball to S3, then runs a deploy script on the instance via AWS SSM Run Command — no SSH keys required anywhere.
 
 ```
 GitHub push → Actions build → S3 artifact → SSM → instance pulls & restarts
 ```
+
+---
+
+## Before you begin
+
+Adapt the following to your own environment before deploying:
+
+| What | Where to change |
+|---|---|
+| AWS account ID and region | `infra/bin/app.ts`, `cdk bootstrap` command |
+| Domain name and Route 53 hosted zone ID | Constants at the top of `infra/src/stacks/EC2Stack.ts` |
+| GitHub repository name | `token.actions.githubusercontent.com:sub` condition in `EC2Stack.ts` |
+| S3 bucket name (includes account ID) | `env.S3_BUCKET` in `.github/workflows/deploy.yml` |
 
 ---
 
