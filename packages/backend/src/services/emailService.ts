@@ -1,11 +1,11 @@
 import nodemailer from 'nodemailer';
-import { SESClient, SendRawEmailCommand } from '@aws-sdk/client-ses';
+import { SESv2Client, SendEmailCommand } from '@aws-sdk/client-sesv2';
 import { config } from '../config.js';
 
 function createTransport() {
   if (config.SES_FROM_ADDRESS) {
-    const ses = new SESClient({ region: config.AWS_REGION });
-    return nodemailer.createTransport({ SES: { ses, aws: { SendRawEmailCommand } } } as nodemailer.TransportOptions);
+    const ses = new SESv2Client({ region: config.AWS_REGION });
+    return nodemailer.createTransport({ SES: { ses, aws: { SendEmailCommand } } } as nodemailer.TransportOptions);
   }
   // Console fallback — logs the email instead of sending
   return nodemailer.createTransport({ jsonTransport: true });
