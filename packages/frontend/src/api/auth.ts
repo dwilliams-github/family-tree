@@ -24,3 +24,16 @@ export async function updateDisplayName(displayName: string): Promise<AuthRespon
   const res = await api.patch<AuthResponse>('/auth/me', { displayName });
   return res.data;
 }
+
+export interface UserSummary {
+  id: string;
+  email: string;
+  displayName: string | null;
+  role: string;
+  createdAt: string;
+}
+
+export async function getUsers(): Promise<UserSummary[]> {
+  const res = await api.get<UserSummary[]>('/auth/users');
+  return res.data;
+}

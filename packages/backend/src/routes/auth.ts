@@ -60,6 +60,19 @@ router.get('/me', requireAuth, async (req, res, next) => {
   }
 });
 
+// GET /api/auth/users  (admin only)
+router.get('/users', requireAuth, requireAdmin, async (req, res, next) => {
+  try {
+    const users = await prisma.user.findMany({
+      select: { id: true, email: true, displayName: true, role: true, createdAt: true },
+      orderBy: { createdAt: 'asc' },
+    });
+    res.json(users);
+  } catch (err) {
+    next(err);
+  }
+});
+
 // PATCH /api/auth/me
 router.patch('/me', requireAuth, async (req, res, next) => {
   try {

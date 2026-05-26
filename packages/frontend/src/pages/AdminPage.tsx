@@ -3,6 +3,7 @@ import { useAuth } from '@/auth/AuthContext';
 import { Button } from '@/components/ui/button';
 import { DisplayNameForm } from '@/components/admin/DisplayNameForm';
 import { InviteUserForm } from '@/components/admin/InviteUserForm';
+import { UserList } from '@/components/admin/UserList';
 import { AuditLogViewer } from '@/components/admin/AuditLogViewer';
 import { downloadMarkdown } from '@/api/export';
 import { toast } from 'sonner';
@@ -32,6 +33,7 @@ export function AdminPage() {
       <main className="max-w-4xl mx-auto px-6 py-8 space-y-10 min-h-[calc(100vh-8rem)]">
         <DisplayNameForm />
         <InviteUserForm />
+        <UserList />
         <AuditLogViewer />
       </main>
       <footer className="border-t border-border px-6 py-3 text-xs text-muted-foreground text-center">
