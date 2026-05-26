@@ -29,8 +29,9 @@ export interface UserSummary {
   id: string;
   email: string;
   displayName: string | null;
-  role: string;
+  role: string | null;
   createdAt: string;
+  status: 'active' | 'pending';
 }
 
 export async function getUsers(): Promise<UserSummary[]> {

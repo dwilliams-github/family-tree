@@ -30,12 +30,18 @@ export function UserList() {
                   <td className="px-4 py-2">{u.email}</td>
                   <td className="px-4 py-2 text-muted-foreground">{u.displayName ?? '—'}</td>
                   <td className="px-4 py-2">
-                    <Badge variant={u.role === 'ADMIN' ? 'default' : 'secondary'}>
-                      {u.role.toLowerCase()}
-                    </Badge>
+                    {u.status === 'pending' ? (
+                      <Badge variant="outline">pending</Badge>
+                    ) : (
+                      <Badge variant={u.role === 'ADMIN' ? 'default' : 'secondary'}>
+                        {u.role!.toLowerCase()}
+                      </Badge>
+                    )}
                   </td>
                   <td className="px-4 py-2 text-muted-foreground">
-                    {new Date(u.createdAt).toLocaleDateString()}
+                    {u.status === 'pending'
+                      ? <span className="italic">invited {new Date(u.createdAt).toLocaleDateString()}</span>
+                      : new Date(u.createdAt).toLocaleDateString()}
                   </td>
                 </tr>
               ))}

@@ -63,11 +63,24 @@ router.get('/me', requireAuth, async (req, res, next) => {
 // GET /api/auth/users  (admin only)
 router.get('/users', requireAuth, requireAdmin, async (req, res, next) => {
   try {
-    const users = await prisma.user.findMany({
-      select: { id: true, email: true, displayName: true, role: true, createdAt: true },
-      orderBy: { createdAt: 'asc' },
-    });
-    res.json(users);
+    const [users, invitations] = await Promise.all([
+      prisma.user.findMany({
+        select: { id: true, email: true, displayName: true, role: true, createdAt: true },
+        orderBy: { createdAt: 'asc' },
+      }),
+      prisma.invitation.findMany({
+        where: { acceptedAt: null, expiresAt: { gt: new Date() } },
+        select: { id: true, email: true, createdAt: true },
+        orderBy: { createdAt: 'asc' },
+      }),
+    ]);
+
+    const result = [
+      ...users.map(u => ({ ...u, status: 'active' as const })),
+      ...invitations.map(i => ({ id: i.id, email: i.email, displayName: null, role: null, createdAt: i.createdAt, status: 'pending' as const })),
+    ].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+
+    res.json(result);
   } catch (err) {
     next(err);
   }
