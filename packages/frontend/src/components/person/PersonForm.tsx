@@ -79,6 +79,8 @@ export function PersonForm({ open, onOpenChange, person }: Props) {
       : { firstName: '', isLiving: true },
   });
 
+  const isLiving = form.watch('isLiving') ?? true;
+
   async function onSubmit(values: FormValues) {
     try {
       if (isEdit) {
@@ -167,9 +169,9 @@ export function PersonForm({ open, onOpenChange, person }: Props) {
                 </FormItem>
               )} />
               <FormField control={form.control} name="dateOfDeath" render={({ field }) => (
-                <FormItem>
+                <FormItem className={isLiving ? 'opacity-40' : ''}>
                   <FormLabel>Date of death</FormLabel>
-                  <FormControl><Input type="date" {...field} /></FormControl>
+                  <FormControl><Input type="date" disabled={isLiving} {...field} /></FormControl>
                 </FormItem>
               )} />
             </div>
@@ -182,9 +184,9 @@ export function PersonForm({ open, onOpenChange, person }: Props) {
                 </FormItem>
               )} />
               <FormField control={form.control} name="placeOfDeath" render={({ field }) => (
-                <FormItem>
+                <FormItem className={isLiving ? 'opacity-40' : ''}>
                   <FormLabel>Place of death</FormLabel>
-                  <FormControl><Input {...field} /></FormControl>
+                  <FormControl><Input disabled={isLiving} {...field} /></FormControl>
                 </FormItem>
               )} />
             </div>
