@@ -33,6 +33,38 @@ export class EC2Stack extends cdk.Stack {
     });
 
     backupBucket.grantWrite(role);
+    // Instance must also download deploy artifacts uploaded by GitHub Actions
+    role.addToPrincipalPolicy(new iam.PolicyStatement({
+      actions: ['s3:GetObject'],
+      resources: [`${backupBucket.bucketArn}/deploy/*`],
+    }));
+
+    // ── GitHub Actions OIDC — keyless deploy role ────────────────────────────
+    const githubProvider = new iam.OpenIdConnectProvider(this, 'GitHubOIDC', {
+      url: 'https://token.actions.githubusercontent.com',
+      clientIds: ['sts.amazonaws.com'],
+      // Thumbprint list per https://github.blog/changelog/2023-06-27-github-actions-update-on-oidc-integration-with-aws/
+      thumbprints: ['6938fd4d98bab03faadb97b34396831e3780aea1'],
+    });
+
+    const deployRole = new iam.Role(this, 'GitHubDeployRole', {
+      assumedBy: new iam.WebIdentityPrincipal(githubProvider.openIdConnectProviderArn, {
+        StringEquals: {
+          'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
+          // Locked to main branch only — PRs and other branches cannot deploy
+          'token.actions.githubusercontent.com:sub':
+            'repo:dwilliams-github/family-tree:ref:refs/heads/main',
+        },
+      }),
+      description: 'Assumed by GitHub Actions main branch to deploy via SSM',
+      maxSessionDuration: cdk.Duration.hours(1),
+    });
+
+    // Upload deploy artifacts + download deploy script
+    deployRole.addToPolicy(new iam.PolicyStatement({
+      actions: ['s3:PutObject', 's3:GetObject'],
+      resources: [`${backupBucket.bucketArn}/deploy/*`],
+    }));
 
     // ── VPC + Security Group ─────────────────────────────────────────────────
     const vpc = ec2.Vpc.fromLookup(this, 'DefaultVPC', { isDefault: true });
@@ -70,6 +102,19 @@ export class EC2Stack extends cdk.Stack {
       // IMDSv2 only
       requireImdsv2: true,
     });
+
+    // SSM: send commands to this specific instance only, using the standard document
+    deployRole.addToPolicy(new iam.PolicyStatement({
+      actions: ['ssm:SendCommand'],
+      resources: [
+        `arn:aws:ssm:${this.region}::document/AWS-RunShellScript`,
+        `arn:aws:ec2:${this.region}:${this.account}:instance/${instance.instanceId}`,
+      ],
+    }));
+    deployRole.addToPolicy(new iam.PolicyStatement({
+      actions: ['ssm:GetCommandInvocation'],
+      resources: ['*'],
+    }));
 
     // ── Separate EBS volume for Postgres data (survives instance replacement) ─
     // On Nitro/t4g, devices attached as /dev/sdf appear as /dev/nvme1n1.
@@ -146,6 +191,7 @@ export class EC2Stack extends cdk.Stack {
     instance.addUserData(buildUserData(backupBucket.bucketName, FQDN));
 
     // ── Outputs ──────────────────────────────────────────────────────────────
+    new cdk.CfnOutput(this, 'OutDeployRoleArn', { value: deployRole.roleArn,         description: 'Set as AWS_DEPLOY_ROLE_ARN GitHub secret' });
     new cdk.CfnOutput(this, 'OutElasticIP',    { value: eip.ref,                   description: 'Elastic IP address' });
     new cdk.CfnOutput(this, 'OutInstanceId',   { value: instance.instanceId,       description: 'EC2 instance ID' });
     new cdk.CfnOutput(this, 'OutDataVolumeId', { value: dataVolume.volumeId,       description: 'Postgres EBS volume ID' });
@@ -230,10 +276,8 @@ if ! node --version 2>/dev/null | grep -q "^v20"; then
 fi
 echo "Node: $(node --version)  npm: $(npm --version)"
 
-# ── PM2 ──────────────────────────────────────────────────────────────────────
-if ! command -v pm2 &>/dev/null; then
-  npm install -g pm2
-fi
+# ── PM2 + Prisma CLI (global, used by deploy script for migrations) ──────────
+npm install -g pm2 prisma
 pm2 startup systemd -u ec2-user --hp /home/ec2-user 2>/dev/null | grep "^sudo" | bash || true
 systemctl enable pm2-ec2-user 2>/dev/null || true
 
