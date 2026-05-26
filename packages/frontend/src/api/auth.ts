@@ -19,3 +19,8 @@ export async function acceptInvite(token: string, password: string): Promise<Aut
 export async function sendInvite(email: string): Promise<void> {
   await api.post('/auth/invite', { email });
 }
+
+export async function updateDisplayName(displayName: string): Promise<AuthResponse> {
+  const res = await api.patch<AuthResponse>('/auth/me', { displayName });
+  return res.data;
+}

@@ -111,6 +111,16 @@ export function AcceptInvitePage() {
               )}
             />
 
+            <details className="group text-sm">
+              <summary className="cursor-pointer text-muted-foreground hover:text-foreground list-none flex items-center gap-1 select-none w-fit">
+                <span className="transition-transform group-open:rotate-90">›</span>
+                Password tip
+              </summary>
+              <p className="mt-1.5 text-muted-foreground pl-4">
+                Choose a password you don't use anywhere else. A passphrase or password manager suggestion works well.
+              </p>
+            </details>
+
             {errors.root && (
               <p className="text-sm text-destructive text-center">{errors.root.message}</p>
             )}

@@ -1,11 +1,13 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
 import type { JwtPayload } from '@family-tree/shared';
+import { updateDisplayName } from '@/api/auth';
 
 interface AuthContextValue {
   user: JwtPayload | null;
   token: string | null;
   login: (token: string) => void;
   logout: () => void;
+  updateUser: (displayName: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -39,8 +41,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }
 
+  async function updateUser(displayName: string) {
+    const { token: newToken } = await updateDisplayName(displayName);
+    login(newToken);
+  }
+
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ user, token, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -39,6 +39,11 @@ export class EC2Stack extends cdk.Stack {
       actions: ['s3:GetObject'],
       resources: [`${backupBucket.bucketArn}/deploy/*`],
     }));
+    // SES — send invite emails
+    role.addToPrincipalPolicy(new iam.PolicyStatement({
+      actions: ['ses:SendEmail', 'ses:SendRawEmail'],
+      resources: ['*'],
+    }));
 
     // ── GitHub Actions OIDC — keyless deploy role ────────────────────────────
     const githubProvider = new iam.OpenIdConnectProvider(this, 'GitHubOIDC', {

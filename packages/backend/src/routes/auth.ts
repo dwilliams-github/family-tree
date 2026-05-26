@@ -22,6 +22,10 @@ const acceptSchema = z.object({
   password: z.string().min(8),
 });
 
+const updateMeSchema = z.object({
+  displayName: z.string().min(1).max(100),
+});
+
 // POST /api/auth/login
 router.post('/login', async (req, res, next) => {
   try {
@@ -56,6 +60,21 @@ router.get('/me', requireAuth, async (req, res, next) => {
   }
 });
 
+// PATCH /api/auth/me
+router.patch('/me', requireAuth, async (req, res, next) => {
+  try {
+    const { displayName } = updateMeSchema.parse(req.body);
+    const user = await prisma.user.update({
+      where: { id: req.user!.sub },
+      data: { displayName },
+    });
+    const token = signToken({ sub: user.id, email: user.email, role: user.role, displayName: user.displayName ?? undefined });
+    res.json({ token, user: { id: user.id, email: user.email, role: user.role, displayName: user.displayName } });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // POST /api/auth/invite  (admin only)
 router.post('/invite', requireAuth, requireAdmin, async (req, res, next) => {
   try {
@@ -80,7 +99,8 @@ router.post('/invite', requireAuth, requireAdmin, async (req, res, next) => {
       data: { email, token, invitedBy: req.user!.sub, expiresAt },
     });
 
-    await sendInviteEmail(email, token);
+    const admin = await prisma.user.findUnique({ where: { id: req.user!.sub } });
+    await sendInviteEmail(email, token, admin?.displayName ?? undefined);
 
     res.status(201).json({ message: `Invitation sent to ${email}` });
   } catch (err) {

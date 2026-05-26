@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/auth/AuthContext';
 import { Button } from '@/components/ui/button';
+import { DisplayNameForm } from '@/components/admin/DisplayNameForm';
 import { InviteUserForm } from '@/components/admin/InviteUserForm';
 import { AuditLogViewer } from '@/components/admin/AuditLogViewer';
 import { downloadMarkdown } from '@/api/export';
@@ -29,6 +30,7 @@ export function AdminPage() {
       </header>
 
       <main className="max-w-4xl mx-auto px-6 py-8 space-y-10 min-h-[calc(100vh-8rem)]">
+        <DisplayNameForm />
         <InviteUserForm />
         <AuditLogViewer />
       </main>
