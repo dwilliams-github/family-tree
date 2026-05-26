@@ -18,7 +18,7 @@ Adapt the following to your own environment before deploying:
 
 | What | Where to change |
 |---|---|
-| AWS account ID and region | `infra/bin/app.ts`, `cdk bootstrap` command |
+| AWS account ID and region | `infra/bin/app.ts`, `npx cdk bootstrap` command |
 | Domain name and Route 53 hosted zone ID | Constants at the top of `infra/src/stacks/EC2Stack.ts` |
 | GitHub repository name | `token.actions.githubusercontent.com:sub` condition in `EC2Stack.ts` |
 | S3 bucket name (includes account ID) | `env.S3_BUCKET` in `.github/workflows/deploy.yml` |
@@ -32,13 +32,13 @@ Adapt the following to your own environment before deploying:
 ```bash
 cd infra
 npm install
-cdk bootstrap aws://777312966064/us-east-1
+npx cdk bootstrap aws://777312966064/us-east-1
 ```
 
 ### 2. Deploy the stack
 
 ```bash
-cdk deploy
+npx cdk deploy
 ```
 
 Note the outputs — you'll need them in step 5:

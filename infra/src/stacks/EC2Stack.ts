@@ -77,7 +77,7 @@ export class EC2Stack extends cdk.Stack {
 
     const sg = new ec2.SecurityGroup(this, 'InstanceSG', {
       vpc,
-      description: 'Family tree EC2 — HTTP/HTTPS public, SSH restricted',
+      description: 'Family tree EC2 - HTTP/HTTPS public, SSH restricted',
       allowAllOutbound: true,
     });
     sg.addIngressRule(ec2.Peer.anyIpv4(),  ec2.Port.tcp(80),  'HTTP');
@@ -172,7 +172,7 @@ export class EC2Stack extends cdk.Stack {
     });
 
     new dlm.CfnLifecyclePolicy(this, 'SnapshotPolicy', {
-      description: 'Daily EBS snapshots of Postgres data volume — 7-day retention',
+      description: 'Daily EBS snapshots of Postgres data volume - 7-day retention',
       state: 'ENABLED',
       executionRoleArn: dlmRole.roleArn,
       policyDetails: {
