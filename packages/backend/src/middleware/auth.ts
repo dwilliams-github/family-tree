@@ -2,11 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import { verifyToken } from '../services/authService.js';
 import type { JwtPayload } from '@family-tree/shared';
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: JwtPayload;
-    }
+declare module 'express-serve-static-core' {
+  interface Request {
+    user?: JwtPayload;
   }
 }
 

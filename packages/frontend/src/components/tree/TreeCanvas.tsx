@@ -82,7 +82,7 @@ export function TreeCanvas({ dto, selectedPersonId, onPersonSelect }: Props) {
       ? (el.clientHeight - layout.canvasHeight * s) / 2
       : 40;
     return { s, ...clamp(x, y, s) };
-  }, [layout.canvasWidth, layout.canvasHeight]);
+  }, [layout.canvasWidth, layout.canvasHeight, clamp]);
 
   useEffect(() => {
     const fit = computeFit();

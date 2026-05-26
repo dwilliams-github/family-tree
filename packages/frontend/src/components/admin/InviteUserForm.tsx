@@ -36,7 +36,7 @@ export function InviteUserForm() {
       <div>
         <h2 className="font-semibold">Invite a user</h2>
         <p className="text-sm text-muted-foreground mt-0.5">
-          They'll receive an email with a link to set their password.
+          They&apos;ll receive an email with a link to set their password.
         </p>
       </div>
       <Form {...form}>

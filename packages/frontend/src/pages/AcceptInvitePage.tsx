@@ -117,7 +117,7 @@ export function AcceptInvitePage() {
                 Password tip
               </summary>
               <p className="mt-1.5 text-muted-foreground pl-4">
-                Choose a password you don't use anywhere else. A passphrase or password manager suggestion works well.
+                Choose a password you don&apos;t use anywhere else. A passphrase or password manager suggestion works well.
               </p>
             </details>
 
