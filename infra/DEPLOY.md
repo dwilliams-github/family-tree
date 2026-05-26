@@ -89,6 +89,23 @@ Certbot modifies the Nginx config and installs a renewal cron automatically.
 
 Push any commit to `main` (or re-run the workflow manually in Actions). The pipeline will build the app, deploy it to the instance, run migrations, and start PM2.
 
+### 8. Seed the database (first time only)
+
+Compile and copy the seed script to the instance, then run it:
+
+```bash
+# From your local machine (in the repo root)
+npm run build -w packages/backend
+scp packages/backend/dist/scripts/seed.js ec2-user@<elastic-ip>:/tmp/seed.js
+
+# On the instance (via SSH or SSM session)
+cd /opt/family-tree/packages/backend
+node /tmp/seed.js
+rm /tmp/seed.js
+```
+
+The seed script uses the `DATABASE_URL` already set in `.env`.
+
 ---
 
 ## Ongoing deployments
