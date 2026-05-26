@@ -4,8 +4,8 @@ import { config } from '../config.js';
 
 function createTransport() {
   if (config.SES_FROM_ADDRESS) {
-    const ses = new SESv2Client({ region: config.AWS_REGION });
-    return nodemailer.createTransport({ SES: { ses, aws: { SendEmailCommand } } } as nodemailer.TransportOptions);
+    const sesClient = new SESv2Client({ region: config.AWS_REGION });
+    return nodemailer.createTransport({ SES: { sesClient, SendEmailCommand } } as nodemailer.TransportOptions);
   }
   // Console fallback — logs the email instead of sending
   return nodemailer.createTransport({ jsonTransport: true });
