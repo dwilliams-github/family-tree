@@ -20,6 +20,7 @@ export function toPersonSummary(p: PrismaPersonModel): PersonSummary {
     dateOfDeath: formatDate(p.dateOfDeath),
     isLiving: p.isLiving,
     hasPhoto: p.photoData !== null,
+    createdAt: p.createdAt.toISOString(),
   };
 }
 

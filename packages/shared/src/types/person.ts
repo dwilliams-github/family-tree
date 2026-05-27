@@ -6,6 +6,7 @@ export interface PersonSummary {
   dateOfDeath?: string;
   isLiving: boolean;
   hasPhoto: boolean;
+  createdAt: string;
 }
 
 export interface Person extends PersonSummary {
@@ -19,7 +20,6 @@ export interface Person extends PersonSummary {
   addressCountry?: string;
   bio?: string;
   createdBy: string;
-  createdAt: string;
   updatedAt: string;
 }
 
