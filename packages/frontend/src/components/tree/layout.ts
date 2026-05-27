@@ -118,6 +118,21 @@ export function computeLayout(dto: GraphDTO): LayoutResult {
     personToUnit.set(person.id, unitId);
   }
 
+  // Birth date lookup for child ordering (missing dates sort last)
+  const birthYear = new Map<string, number>();
+  const createdAt = new Map<string, number>();
+  for (const p of persons) {
+    if (p.dateOfBirth) birthYear.set(p.id, parseInt(p.dateOfBirth.slice(0, 4), 10));
+    createdAt.set(p.id, new Date(p.createdAt).getTime());
+  }
+  const byBirth = (a: string, b: string) => {
+    const ba = birthYear.get(a), bb = birthYear.get(b);
+    if (ba !== undefined && bb !== undefined) return ba - bb;
+    if (ba !== undefined) return -1;
+    if (bb !== undefined) return 1;
+    return (createdAt.get(a) ?? 0) - (createdAt.get(b) ?? 0);
+  };
+
   // Assign children to units; track which person in the child unit is the descendant
   const assignedAsChild = new Set<string>();
 
@@ -133,6 +148,8 @@ export function computeLayout(dto: GraphDTO): LayoutResult {
         ? unit.childUnitRefs.push({ unitId: cu, descendantId: childId })
         : unit.leafChildIds.push(childId);
     }
+    unit.leafChildIds.sort(byBirth);
+    unit.childUnitRefs.sort((a, b) => byBirth(a.descendantId, b.descendantId));
   }
   for (const unit of units.values()) {
     if (unit.parents.length !== 1) continue;
@@ -144,6 +161,8 @@ export function computeLayout(dto: GraphDTO): LayoutResult {
         ? unit.childUnitRefs.push({ unitId: cu, descendantId: childId })
         : unit.leafChildIds.push(childId);
     }
+    unit.leafChildIds.sort(byBirth);
+    unit.childUnitRefs.sort((a, b) => byBirth(a.descendantId, b.descendantId));
   }
 
   // Root units = not referenced as a child unit by any other
