@@ -37,7 +37,7 @@ export function TreePage() {
       </div>
 
       <PersonPopup personId={selectedPersonId} onClose={() => setSelectedPersonId(null)} />
-      <PersonForm open={addOpen} onOpenChange={setAddOpen} />
+      <PersonForm open={addOpen} onOpenChange={setAddOpen} onCreated={id => { setAddOpen(false); setSelectedPersonId(id); }} />
     </div>
   );
 }

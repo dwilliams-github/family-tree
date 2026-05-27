@@ -51,9 +51,10 @@ interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   person?: Person;
+  onCreated?: (id: string) => void;
 }
 
-export function PersonForm({ open, onOpenChange, person }: Props) {
+export function PersonForm({ open, onOpenChange, person, onCreated }: Props) {
   const qc = useQueryClient();
   const isEdit = !!person;
 
@@ -88,8 +89,12 @@ export function PersonForm({ open, onOpenChange, person }: Props) {
         await qc.invalidateQueries({ queryKey: ['person', person.id] });
         toast.success('Person updated');
       } else {
-        await createPerson(toInput(values));
+        const created = await createPerson(toInput(values));
         toast.success('Person added');
+        await qc.invalidateQueries({ queryKey: ['tree'] });
+        onOpenChange(false);
+        onCreated?.(created.id);
+        return;
       }
       await qc.invalidateQueries({ queryKey: ['tree'] });
       onOpenChange(false);
