@@ -64,7 +64,7 @@ export function PhotoUpload({ person }: Props) {
       <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
 
       {preview
-        ? <img src={preview} alt="Preview" className="h-24 w-24 rounded-full object-cover" />
+        ? <img src={preview} alt="Preview" className="h-40 w-40 rounded-full object-cover" />
         : <PersonAvatar personId={person.id} hasPhoto={person.hasPhoto} firstName={person.firstName} lastName={person.lastName} size="lg" />
       }
 

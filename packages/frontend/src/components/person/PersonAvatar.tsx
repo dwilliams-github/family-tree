@@ -13,7 +13,7 @@ interface Props {
 const SIZE = {
   sm: 'h-8 w-8 text-xs',
   md: 'h-14 w-14 text-base',
-  lg: 'h-24 w-24 text-2xl',
+  lg: 'h-40 w-40 text-4xl',
 };
 
 export function PersonAvatar({ personId, hasPhoto, firstName, lastName, size = 'md', className }: Props) {
