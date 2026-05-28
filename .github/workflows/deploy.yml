@@ -3,6 +3,10 @@ name: Deploy
 on:
   push:
     branches: [main]
+    paths:
+      - 'packages/**'
+      - 'scripts/**'
+      - 'package*.json'
 
 # Required for GitHub OIDC → AWS role assumption (no stored AWS keys)
 permissions:

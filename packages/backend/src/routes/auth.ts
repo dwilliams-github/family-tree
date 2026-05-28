@@ -16,6 +16,7 @@ const loginSchema = z.object({
 
 const inviteSchema = z.object({
   email: z.string().email(),
+  sendEmail: z.boolean().default(true),
 });
 
 const acceptSchema = z.object({
@@ -104,7 +105,7 @@ router.patch('/me', requireAuth, async (req, res, next) => {
 // POST /api/auth/invite  (admin only)
 router.post('/invite', requireAuth, requireAdmin, async (req, res, next) => {
   try {
-    const { email } = inviteSchema.parse(req.body);
+    const { email, sendEmail } = inviteSchema.parse(req.body);
 
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
@@ -125,10 +126,13 @@ router.post('/invite', requireAuth, requireAdmin, async (req, res, next) => {
       data: { email, token, invitedBy: req.user!.sub, expiresAt },
     });
 
-    const admin = await prisma.user.findUnique({ where: { id: req.user!.sub } });
-    await sendInviteEmail(email, token, admin?.displayName ?? undefined);
+    if (sendEmail) {
+      const admin = await prisma.user.findUnique({ where: { id: req.user!.sub } });
+      await sendInviteEmail(email, token, admin?.displayName ?? undefined);
+    }
 
-    res.status(201).json({ message: `Invitation sent to ${email}` });
+    const link = `${process.env.APP_URL}/accept-invite?token=${token}`;
+    res.status(201).json({ message: `Invitation created for ${email}`, link });
   } catch (err) {
     next(err);
   }
